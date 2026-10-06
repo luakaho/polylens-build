@@ -1,0 +1,33 @@
+name: Build ARM64 Docker Image
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          tags: polylens-test:latest
+          outputs: type=docker,dest=/tmp/polylens-test.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: polylens-docker-image
+          path: /tmp/polylens-test.tar
